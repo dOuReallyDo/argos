@@ -69,21 +69,11 @@ class TextEmbedder(Embedder):
 
     def _get_model(self):
         if self._model is None:
-            import asyncio
+            from sentence_transformers import SentenceTransformer
 
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                from sentence_transformers import SentenceTransformer
-
-                self._model = SentenceTransformer(
-                    self._model_name, device=settings.embedding_device
-                )
-            else:
-                from sentence_transformers import SentenceTransformer
-
-                self._model = SentenceTransformer(
-                    self._model_name, device=settings.embedding_device
-                )
+            self._model = SentenceTransformer(
+                self._model_name, device=settings.embedding_device
+            )
         return self._model
 
     async def embed_texts(self, texts: list[str]) -> np.ndarray:
@@ -96,7 +86,7 @@ class TextEmbedder(Embedder):
             model = self._get_model()
             return model.encode(prefixed, normalize_embeddings=True)
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         embeddings = await loop.run_in_executor(None, _embed)
         return np.array(embeddings, dtype=np.float32)
 
@@ -110,7 +100,7 @@ class TextEmbedder(Embedder):
 
         import asyncio
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         embeddings = await loop.run_in_executor(None, _embed)
         return np.array(embeddings, dtype=np.float32)
 
@@ -175,7 +165,7 @@ class CLIPEmbedder(Embedder):
             )
             return embeddings.numpy()
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _embed)
 
     async def embed_images(self, image_paths: list[Path]) -> np.ndarray:
@@ -202,7 +192,7 @@ class CLIPEmbedder(Embedder):
             )
             return embeddings.numpy()
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _embed)
 
     async def embed_audio(self, audio_paths: list[Path]) -> np.ndarray:
@@ -259,7 +249,7 @@ class CLAPEmbedder(Embedder):
             )
             return embeddings.numpy()
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _embed)
 
     async def embed_images(self, image_paths: list[Path]) -> np.ndarray:
@@ -294,7 +284,7 @@ class CLAPEmbedder(Embedder):
             )
             return embeddings.numpy()
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _embed)
 
 

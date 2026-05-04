@@ -161,13 +161,19 @@ async def upload_document(
     All processing is synchronous in this version; a Celery task
     queue is available for production deployments.
     """
-    # Verify source exists
+    # Verify or auto-create source (supports email, alias, or UUID)
     source = await SourceRepository.get_by_id(db, source_id)
     if not source:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Source not found: {source_id}",
-        )
+        # Try as email/alias — auto-register if it looks like a value not an ID
+        if "@" in source_id or len(source_id) > 12:
+            from core.models import SourceType
+            stype = SourceType.EMAIL if "@" in source_id else SourceType.ALIAS
+            source = await SourceRepository.get_or_create(db, stype, source_id)
+        if not source:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Source not found: {source_id}",
+            )
 
     # Validate file size
     contents = await file.read()

@@ -45,7 +45,7 @@ class ImageParser(BaseParser):
     ]
 
     async def parse(self, file_path: Path) -> ParsedDocument:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._parse_sync, file_path)
 
     def _parse_sync(self, file_path: Path) -> ParsedDocument:

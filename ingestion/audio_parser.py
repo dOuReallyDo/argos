@@ -41,7 +41,7 @@ class AudioParser(BaseParser):
     ]
 
     async def parse(self, file_path: Path) -> ParsedDocument:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         # Get metadata via ffprobe
         metadata = await loop.run_in_executor(

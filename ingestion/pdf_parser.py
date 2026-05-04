@@ -52,7 +52,7 @@ class PDFParser(BaseParser):
         tables = []
         metadata = {}
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def _extract():
             with pdfplumber.open(str(file_path)) as pdf:
