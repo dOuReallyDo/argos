@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test & coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.coverage.*
+
+# Storage
+data/
+uploads/
+storage/
+qdrant_data/
+chroma_data/
+*.db
+*.sqlite3
+
+# Keys & certs
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+
+# Docker
+.docker/
+
+# Logs
+logs/
+*.log
+
+# Celery
+celerybeat-schedule
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node (UI)
+ui/node_modules/
+ui/dist/
+ui/.vite/
+
+# OS
+Thumbs.db
