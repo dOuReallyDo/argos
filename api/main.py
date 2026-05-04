@@ -7,12 +7,14 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 
 from core.config import get_settings
 from core.logging import logger
 from storage.database import close_db, init_db
 
 from .routes import router
+from .oauth import router as oauth_router
 
 settings = get_settings()
 
@@ -78,10 +80,21 @@ app.add_middleware(
 
 # ── Routes ────────────────────────────────────────────────────
 app.include_router(router, prefix="/api")
+app.include_router(oauth_router, prefix="/api/auth")
 
 
 # ── Root endpoint ─────────────────────────────────────────────
-@app.get("/", tags=["System"])
+# ── Root (SPA) ─────────────────────────────────────────
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_spa():
+    spa_path = Path(__file__).resolve().parent.parent / "ui" / "spa.html"
+    if spa_path.exists():
+        return HTMLResponse(content=spa_path.read_text())
+    return HTMLResponse(content="<h1>Argos API</h1><p>SPA not built. Visit /docs for API.</p>")
+
+
+@app.get("/api", tags=["System"])
 async def root():
     return {
         "name": "Argos RAG",

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Argos RAG</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#4263eb;--primary-light:#dbe4ff;--green:#2f9e44;--red:#e03131;--gray-50:#f8f9fa;--gray-100:#f1f3f5;--gray-200:#e9ecef;--gray-300:#dee2e6;--gray-400:#adb5bd;--gray-500:#868e96;--gray-600:#495057;--gray-700:#343a40;--gray-800:#212529;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+nav{background:#fff;border-bottom:1px solid var(--gray-200);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+nav .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;color:var(--gray-800)}
+nav .logo svg{width:28px;height:28px}
+nav .badge{font-size:10px;background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:99px;font-weight:600;text-transform:uppercase}
+nav .tabs{display:flex;gap:4px}
+nav .tabs button{padding:7px 14px;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--gray-600)}
+nav .tabs button.active,nav .tabs button:hover{background:var(--primary-light);color:var(--primary)}
+main{max-width:680px;margin:0 auto;padding:20px 16px 60px}
+.page{display:none}
+.page.active{display:block}
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card h2{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--gray-700)}
+input[type=text],input[type=email],input[type=file]{width:100%;padding:10px 14px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s}
+input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(66,99,235,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#364fc7}
+.btn-secondary{background:var(--gray-100);color:var(--gray-700)}
+.btn-secondary:hover{background:var(--gray-200)}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-sm{padding:6px 12px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center}
+.gap{margin-top:12px}
+.dropzone{border:2px dashed var(--gray-300);border-radius:var(--radius);padding:32px 16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)}
+.dropzone:hover,.dropzone.drag{border-color:var(--primary);background:var(--primary-light)}
+.dropzone p{color:var(--gray-500);font-size:14px}
+.file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--gray-50);border-radius:8px;margin-top:6px}
+.file-item .name{flex:1;font-size:13px;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item .size{font-size:11px;color:var(--gray-500)}
+.file-item .remove{background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:16px;padding:2px 6px}
+.result-item{padding:12px;border:1px solid var(--gray-200);border-radius:8px;margin-top:8px}
+.result-item .meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.result-item .type{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;text-transform:uppercase}
+.type-pdf{background:#fff3cd;color:#e67700}
+.type-image{background:#e8daef;color:#7b1fa2}
+.type-audio{background:#ffebee;color:#c62828}
+.type-video{background:#e3f2fd;color:#1565c0}
+.type-text{background:#e8f5e9;color:#2e7d32}
+.type-word,.type-excel,.type-powerpoint,.type-markdown{background:#e3f2fd;color:#1565c0}
+.result-item .fname{font-size:13px;font-weight:500;color:var(--gray-800)}
+.result-item .score{font-size:11px;color:var(--gray-400);margin-left:auto}
+.result-item .text{font-size:13px;color:var(--gray-600);line-height:1.5;margin-top:4px}
+.result-item .info{font-size:10px;color:var(--gray-400);margin-top:4px}
+mark{background:#fff3bf;padding:0 2px;border-radius:2px}
+.status{display:flex;align-items:center;gap:6px;font-size:13px;padding:8px 12px;border-radius:8px;margin-top:8px}
+.status.ok{background:#ebfbee;color:#2b8a3e}
+.status.err{background:#fff5f5;color:#c92a2a}
+.source-info{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#ebfbee;border-radius:8px;margin-top:8px;font-size:13px}
+.logout{font-size:11px;color:var(--gray-400);cursor:pointer;margin-left:8px}
+.logout:hover{color:var(--red)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{text-align:center;padding:16px;font-size:11px;color:var(--gray-400);border-top:1px solid var(--gray-200);margin-top:40px}
+.email-row{display:flex;gap:8px}
+.email-row input{flex:1}
+.empty{text-align:center;padding:40px 16px;color:var(--gray-400)}
+.empty svg{margin-bottom:12px;opacity:.3}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">
+<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#4263eb" stroke-width="2"/><path d="M10 20l3-6 3 4 3-8 3 10" stroke="#4263eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="4" r="2" fill="#4263eb"/></svg>
+Argos <span class="badge">RAG</span>
+</div>
+<div class="tabs" id="tabs" style="display:none">
+<button data-page="upload" class="active">📤 Upload</button>
+<button data-page="search">🔍 Cerca</button>
+<button data-page="admin">⚙️ Admin</button>
+</div>
+</nav>
+
+<main>
+<!-- LOGIN PAGE -->
+<div class="page active" id="page-login">
+<div class="card" style="text-align:center">
+<div style="margin-bottom:16px">
+<svg viewBox="0 0 32 32" fill="none" style="width:48px;height:48px;margin:0 auto 8px"><circle cx="16" cy="16" r="14" stroke="#4263eb" stroke-width="2"/><path d="M10 20l3-6 3 4 3-8 3 10" stroke="#4263eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="4" r="2" fill="#4263eb"/></svg>
+<h1 style="font-size:20px;margin-bottom:4px">Argos RAG</h1>
+<p style="color:var(--gray-500);font-size:14px">Sistema RAG modulare multimodale</p>
+</div>
+<div class="email-row">
+<input type="email" id="login-email" placeholder="La tua email..." value="morphblue91@gmail.com">
+<button class="btn btn-primary" onclick="doLogin()">Accedi</button>
+</div>
+<p style="font-size:11px;color:var(--gray-400);margin-top:12px">
+I tuoi documenti sono sempre attribuiti alla tua email verificata.<br>AES-256-GCM · Qdrant · Multimodale
+</p>
+</div>
+</div>
+
+<!-- UPLOAD PAGE -->
+<div class="page" id="page-upload">
+<div class="card">
+<h2>📤 Upload Documenti</h2>
+<div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+<p>📁 Trascina file qui o clicca per selezionare</p>
+<p style="font-size:12px;margin-top:4px">PDF · Word · Excel · PPT · TXT · MD · JPG · PNG · MP3 · MP4 · WAV · MOV...</p>
+</div>
+<input type="file" id="file-input" multiple style="display:none" onchange="addFiles(this.files)">
+<div id="file-list"></div>
+<div class="gap">
+<button class="btn btn-primary" id="upload-btn" onclick="uploadAll()" disabled>📤 Carica e indicizza</button>
+<button class="btn btn-secondary btn-sm" onclick="document.getElementById('file-list').innerHTML='';window._files=[];updateUploadBtn()">Svuota lista</button>
+</div>
+<div id="upload-status"></div>
+</div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div class="page" id="page-search">
+<div class="card">
+<h2>🔍 Ricerca Semantica</h2>
+<div style="display:flex;gap:8px">
+<input type="text" id="search-query" placeholder="Cerca nei tuoi documenti..." onkeydown="if(event.key==='Enter')doSearch()">
+<button class="btn btn-primary" onclick="doSearch()">Cerca</button>
+</div>
+<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center">
+<button class="btn btn-secondary btn-sm type-filter" data-type="" style="background:var(--primary-light);color:var(--primary)">Tutti</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="pdf">PDF</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="word">Word</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="text">Testo</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="image">Immagini</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="audio">Audio</button>
+<button class="btn btn-secondary btn-sm type-filter" data-type="video">Video</button>
+</div>
+</div>
+<div id="search-results"></div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+<div class="card">
+<h2>⚙️ Pannello Amministratore</h2>
+<div class="row" style="margin-bottom:12px">
+<button class="btn btn-secondary" onclick="loadDocs()">📋 Lista Documenti</button>
+<button class="btn btn-secondary" onclick="loadSources()">👥 Fonti Registrate</button>
+<button class="btn btn-secondary" onclick="healthCheck()">❤️ Health</button>
+</div>
+<div id="admin-content"></div>
+</div>
+</div>
+</main>
+
+<div class="footer">Argos v0.1.0 — Modular RAG System • AES-256-GCM • Qdrant</div>
+
+<script>
+// ── State ──
+const API = '';
+let token = '', sourceId = '', userEmail = '', userScope = '';
+window._files = [];
+let selectedType = '';
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if token in URL
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('token')) {
+    token = params.get('token');
+    sourceId = params.get('source_id');
+    userEmail = params.get('email');
+    userScope = params.get('scope');
+    localStorage.setItem('argos_token', token);
+    localStorage.setItem('argos_source', sourceId);
+    localStorage.setItem('argos_email', userEmail);
+    localStorage.setItem('argos_scope', userScope);
+    window.history.replaceState({}, '', '/');
+    showApp();
+  } else {
+    // Check localStorage
+    const saved = localStorage.getItem('argos_token');
+    if (saved) {
+      token = saved;
+      sourceId = localStorage.getItem('argos_source')||'';
+      userEmail = localStorage.getItem('argos_email')||'';
+      userScope = localStorage.getItem('argos_scope')||'read-write';
+      showApp();
+    }
+  }
+
+  // Dropzone
+  const dz = document.getElementById('dropzone');
+  ['dragenter','dragover','dragleave','drop'].forEach(e => {
+    dz.addEventListener(e, ev => ev.preventDefault());
+  });
+  dz.addEventListener('dragover', () => dz.classList.add('drag'));
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => { dz.classList.remove('drag'); addFiles(e.dataTransfer.files); });
+
+  // Tabs
+  document.getElementById('tabs').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showPage(btn.dataset.page);
+    });
+  });
+
+  // Type filters
+  document.querySelectorAll('.type-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.type-filter').forEach(b => {b.style.background='';b.style.color=''});
+      btn.style.background='var(--primary-light)';btn.style.color='var(--primary)';
+      selectedType = btn.dataset.type;
+      doSearch();
+    });
+  });
+});
+
+// ── Auth ──
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) return alert('Inserisci un\'email');
+  // Get token
+  try {
+    const r = await fetch(API + '/api/auth/token', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({source_id: email, scope: email.includes('morphblue')||email.includes('trinity')?'admin':'read-write'})
+    });
+    const data = await r.json();
+    token = data.access_token;
+    // Register source
+    await fetch(API + '/api/sources', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({source_type:'email', source_value: email})
+    });
+    sourceId = email;
+    userEmail = email;
+    userScope = email.includes('morphblue')||email.includes('trinity')?'admin':'read-write';
+    localStorage.setItem('argos_token', token);
+    localStorage.setItem('argos_source', sourceId);
+    localStorage.setItem('argos_email', userEmail);
+    localStorage.setItem('argos_scope', userScope);
+    showApp();
+  } catch(e) {
+    alert('Login fallito: ' + e.message);
+  }
+}
+
+function showApp() {
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('tabs').style.display = 'flex';
+  showPage('upload');
+  if (userScope !== 'admin') {
+    // Hide admin tab for non-admins
+    document.querySelector('[data-page="admin"]').style.display = 'none';
+  }
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+}
+
+function logout() {
+  localStorage.clear();
+  token='';sourceId='';userEmail='';userScope='';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+  document.getElementById('tabs').style.display = 'none';
+}
+
+// ── Upload ──
+function addFiles(files) {
+  for (const f of files) window._files.push(f);
+  renderFileList();
+}
+
+function removeFile(i) {
+  window._files.splice(i,1);
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  if (!window._files.length) { list.innerHTML = ''; updateUploadBtn(); return; }
+  list.innerHTML = window._files.map((f,i) => `
+    <div class="file-item">
+      <span class="name">📄 ${f.name}</span>
+      <span class="size">${fmtSize(f.size)}</span>
+      <button class="remove" onclick="removeFile(${i})">✕</button>
+    </div>
+  `).join('');
+  updateUploadBtn();
+}
+
+function updateUploadBtn() {
+  document.getElementById('upload-btn').disabled = !window._files.length || !token;
+}
+
+function fmtSize(b) {
+  if (b<1024) return b+'B';
+  if (b<1048576) return (b/1024).toFixed(1)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
+}
+
+async function uploadAll() {
+  if (!token) return alert('Devi fare il login prima');
+  const statusDiv = document.getElementById('upload-status');
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Caricamento...';
+  statusDiv.innerHTML = '';
+
+  for (const file of window._files) {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('source_id', sourceId);
+
+    try {
+      const r = await fetch(API + '/api/documents/upload', {
+        method:'POST',
+        headers:{'Authorization':'Bearer '+token},
+        body: form
+      });
+      const data = await r.json();
+      const isOk = r.ok && data.status==='completed';
+      statusDiv.innerHTML += `<div class="status ${isOk?'ok':'err'}">${isOk?'✅':'❌'} ${file.name}: ${data.message||data.detail||'OK'}</div>`;
+    } catch(e) {
+      statusDiv.innerHTML += `<div class="status err">❌ ${file.name}: ${e.message}</div>`;
+    }
+  }
+
+  window._files = [];
+  renderFileList();
+  btn.innerHTML = '📤 Carica e indicizza';
+}
+
+// ── Search ──
+async function doSearch() {
+  const query = document.getElementById('search-query').value.trim();
+  if (!query) return;
+
+  const resultsDiv = document.getElementById('search-results');
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)"><span class="spinner" style="border-color:var(--gray-400);border-top-color:transparent"></span> Ricerca in corso...</div>';
+
+  const body = {query, top_k:20};
+  if (selectedType) body.document_types = [selectedType];
+
+  try {
+    const r = await fetch(API + '/api/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+
+    if (!data.results || !data.results.length) {
+      resultsDiv.innerHTML = '<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><p>Nessun risultato trovato</p><p style="font-size:12px">Prova con parole chiave diverse</p></div>';
+      return;
+    }
+
+    resultsDiv.innerHTML = `<p style="font-size:12px;color:var(--gray-400);margin:8px 0">${data.total_results} risultati • ${data.took_ms?.toFixed(1)||0}ms • ${data.embedding_model||''}</p>` +
+    data.results.map(r => {
+      let typeClass = 'type-' + (r.document_type||'text');
+      if (!document.querySelector('.'+typeClass)) typeClass = 'type-text';
+      const scorePct = ((r.score||0)*100).toFixed(1);
+      const text = highlightText(r.text||'', query);
+      return `<div class="result-item">
+        <div class="meta">
+          <span class="type ${typeClass}">${r.document_type||'text'}</span>
+          <span class="fname">${r.original_filename||'?'}</span>
+          <span class="score">${scorePct}%</span>
+        </div>
+        <div class="text">${text}</div>
+        <div class="info">Chunk #${r.chunk_index||0} · doc:${(r.document_id||'').slice(0,8)} · src:${(r.source_id||'').slice(0,8)}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    resultsDiv.innerHTML = `<div class="status err">❌ Errore ricerca: ${e.message}</div>`;
+  }
+}
+
+function highlightText(text, query) {
+  if (!query || !text) return text||'';
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text.slice(0,200) + (text.length>200?'...':'');
+  const start = Math.max(0, idx-40);
+  const end = Math.min(text.length, idx+query.length+120);
+  let out = '';
+  if (start>0) out += '...';
+  out += text.slice(start, idx);
+  out += '<mark>'+text.slice(idx, idx+query.length)+'</mark>';
+  out += text.slice(idx+query.length, end);
+  if (end<text.length) out += '...';
+  return out;
+}
+
+// ── Admin ──
+async function loadDocs() {
+  const div = document.getElementById('admin-content');
+  div.innerHTML = '<div style="text-align:center;padding:16px"><span class="spinner" style="border-color:var(--gray-400);border-top-color:transparent"></span></div>';
+  try {
+    const r = await fetch(API + '/api/sources', {headers:{'Authorization':'Bearer '+token}});
+    const sources = await r.json();
+    let allDocs = [];
+    for (const src of sources) {
+      const docs = await fetch(API + '/api/documents?source_id='+src.id, {headers:{'Authorization':'Bearer '+token}});
+      // This endpoint might not exist; use search instead
+    }
+    // Simpler: show sources with counts
+    div.innerHTML = sources.map(s => `
+      <div style="padding:8px;border-bottom:1px solid var(--gray-200);font-size:13px">
+        <strong>${s.source_value}</strong>
+        <span style="color:var(--gray-400);margin-left:8px">${s.source_type}</span>
+        <span style="color:var(--gray-400);float:right">ID: ${s.id}</span>
+      </div>
+    `).join('') || '<p style="color:var(--gray-400);padding:16px">Nessuna fonte registrata. Carica documenti prima.</p>';
+  } catch(e) {
+    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
+  }
+}
+
+async function loadSources() {
+  const div = document.getElementById('admin-content');
+  div.innerHTML = '<div style="text-align:center;padding:16px"><span class="spinner" style="border-color:var(--gray-400);border-top-color:transparent"></span></div>';
+  try {
+    const r = await fetch(API + '/api/sources', {headers:{'Authorization':'Bearer '+token}});
+    const sources = await r.json();
+    div.innerHTML = '<table style="width:100%;font-size:13px;border-collapse:collapse"><tr style="border-bottom:2px solid var(--gray-300)"><th style="text-align:left;padding:8px">Tipo</th><th style="text-align:left;padding:8px">Valore</th><th style="text-align:left;padding:8px">ID</th><th style="text-align:left;padding:8px">Creato</th></tr>' +
+    sources.map(s => `<tr style="border-bottom:1px solid var(--gray-200)">
+      <td style="padding:8px"><span class="type type-text">${s.source_type}</span></td>
+      <td style="padding:8px">${s.source_value}</td>
+      <td style="padding:8px;font-family:monospace;font-size:11px">${s.id}</td>
+      <td style="padding:8px;font-size:11px;color:var(--gray-500)">${new Date(s.created_at).toLocaleDateString()}</td>
+    </tr>`).join('') + '</table>';
+  } catch(e) {
+    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
+  }
+}
+
+async function healthCheck() {
+  const div = document.getElementById('admin-content');
+  try {
+    const r = await fetch(API + '/api/health');
+    const data = await r.json();
+    div.innerHTML = Object.entries(data).map(([k,v]) =>
+      `<div style="padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:13px"><strong style="color:var(--gray-600)">${k}:</strong> <span style="font-family:monospace;font-size:12px">${JSON.stringify(v)}</span></div>`
+    ).join('');
+  } catch(e) {
+    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>

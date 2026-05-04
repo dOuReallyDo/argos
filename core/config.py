@@ -65,6 +65,14 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 1440  # 24 hours
 
+    # ── Google OAuth (optional, requires Google Cloud Console setup) ──
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_uri: str = ""
+
+    # ── Cloudflare Tunnel ────────────────────────────────
+    public_host: str = ""  # Set automatically by tunnel
+
     # ── Embedding Models ─────────────────────────────────
     text_embedding_model: str = "intfloat/multilingual-e5-large"
     image_embedding_model: str = "openai/clip-vit-large-patch14"
