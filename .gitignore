@@ -29,10 +29,10 @@ htmlcov/
 .pytest_cache/
 .coverage.*
 
-# Storage
+# Storage (data directories, not the app module)
 data/
 uploads/
-storage/
+/storage/    # Only root-level storage/, not argos/storage/
 qdrant_data/
 chroma_data/
 *.db
