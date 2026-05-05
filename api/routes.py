@@ -202,6 +202,14 @@ async def upload_document(
         # Persist document record
         doc = await DocumentRepository.create(db, record)
 
+        # Store file permanently
+        try:
+            storage_path = await storage_backend.store(tmp_path, record.id, file.filename)
+            doc.storage_path = storage_path
+            await db.commit()
+        except Exception as se:
+            logger.warning(f"File storage failed, keeping temp path: {se}")
+
         if record.status == DocumentStatus.FAILED:
             return DocumentUploadResponse(
                 document_id=record.id,

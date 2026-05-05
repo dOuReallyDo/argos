@@ -6,130 +6,130 @@
 <title>Argos RAG</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#4263eb;--primary-light:#dbe4ff;--green:#2f9e44;--red:#e03131;--gray-50:#f8f9fa;--gray-100:#f1f3f5;--gray-200:#e9ecef;--gray-300:#dee2e6;--gray-400:#adb5bd;--gray-500:#868e96;--gray-600:#495057;--gray-700:#343a40;--gray-800:#212529;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
-nav{background:#fff;border-bottom:1px solid var(--gray-200);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-nav .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
-nav .badge{font-size:9px;background:var(--primary-light);color:var(--primary);padding:2px 6px;border-radius:99px;font-weight:600;text-transform:uppercase}
-nav .user{font-size:11px;color:var(--gray-500);display:flex;align-items:center;gap:8px}
-nav .user a{color:var(--red);text-decoration:none;font-weight:500}
-main{max-width:680px;margin:0 auto;padding:16px}
+:root{--p:#4263eb;--pl:#dbe4ff;--g:#2f9e44;--r:#e03131;--bg:#f8f9fa;--w:#fff;--b1:#e9ecef;--b2:#dee2e3;--t1:#343a40;--t2:#868e96;--t3:#adb5bd;--s:0 1px 3px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:15px}
+nav{background:var(--w);border-bottom:1px solid var(--b1);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+nav .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px}
+nav .badge{font-size:10px;background:var(--pl);color:var(--p);padding:2px 7px;border-radius:99px;font-weight:600;text-transform:uppercase}
+nav .user{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px}
+nav .user a{color:var(--r);text-decoration:none;font-weight:500}
+main{max-width:700px;margin:0 auto;padding:16px}
 .page{display:none}
 .page.active{display:block}
-.card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);padding:20px;margin-bottom:12px;box-shadow:var(--shadow);text-align:center}
-.card-left{text-align:left}
-.card h2{font-size:15px;font-weight:600;margin-bottom:10px}
-.card h3{font-size:14px;font-weight:600;margin-bottom:8px}
-input,select{width:100%;padding:10px 14px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:14px;outline:none}
-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(66,99,235,.12)}
+.c{background:var(--w);border-radius:12px;border:1px solid var(--b1);padding:18px;margin-bottom:14px;box-shadow:var(--s)}
+.c h2{font-size:16px;font-weight:600;margin-bottom:10px}
+.c h3{font-size:14px;font-weight:600;margin-bottom:8px}
+input,select,textarea{width:100%;padding:10px 14px;border:1.5px solid var(--b2);border-radius:8px;font-size:14px;outline:none;box-sizing:border-box}
+input:focus,select:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(66,99,235,.12)}
+textarea{resize:vertical;min-height:80px}
 button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
-.btn-primary{background:var(--primary);color:#fff;width:100%}
-.btn-primary:hover{background:#364fc7}
-.btn-secondary{background:var(--gray-100);color:var(--gray-700)}
+.btn-p{background:var(--p);color:#fff}
+.btn-p:hover{background:#364fc7}
+.btn-s{background:var(--b1);color:var(--t1)}
+.btn-s:hover{background:var(--b2)}
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn:disabled{opacity:.5;pointer-events:none}
+.btn-dl{background:#ebfbee;color:#2b8a3e}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .gap{margin-top:10px}
-.dropzone{border:2px dashed var(--gray-300);border-radius:var(--radius);padding:24px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)}
-.dropzone.drag{border-color:var(--primary);background:var(--primary-light)}
-.dropzone p{color:var(--gray-500);font-size:13px;margin:2px 0}
-.file-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--gray-50);border-radius:8px;margin-top:6px;text-align:left}
+.dropzone{border:2px dashed var(--b2);border-radius:12px;padding:28px 14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.dropzone.drag{border-color:var(--p);background:var(--pl)}
+.dropzone p{color:var(--t2);font-size:13px;margin:2px 0}
+.file-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:8px;margin-top:6px;text-align:left}
 .file-item .name{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-item .size{font-size:11px;color:var(--gray-500)}
-.file-item .remove{background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:16px;padding:2px 6px}
-.status{display:flex;align-items:center;gap:6px;font-size:13px;padding:8px 10px;border-radius:8px;margin-top:8px;text-align:left}
+.file-item .size{font-size:11px;color:var(--t2)}
+.file-item .remove{background:none;border:none;color:var(--t3);cursor:pointer;font-size:17px;padding:2px 6px}
+.status{display:flex;align-items:center;gap:6px;font-size:13px;padding:8px 10px;border-radius:8px;margin-top:6px;text-align:left}
 .ok{background:#ebfbee;color:#2b8a3e}
 .err{background:#fff5f5;color:#c92a2a}
-.empty{text-align:center;padding:32px 16px;color:var(--gray-400);font-size:13px}
-.result{background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:12px;margin-top:8px;text-align:left}
-.result .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
-.result .fname{font-size:13px;font-weight:500}
-.result .score{font-size:11px;color:var(--gray-400);margin-left:auto}
-.result .text{font-size:13px;color:var(--gray-600);line-height:1.4;margin-top:4px}
-.result .info{font-size:10px;color:var(--gray-400);margin-top:4px}
-.doc-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--gray-50);border-radius:8px;margin-top:6px;text-align:left;flex-wrap:wrap;gap:6px}
-.doc-row .info{font-size:12px;color:var(--gray-600)}
-.doc-row .meta{font-size:10px;color:var(--gray-400);display:flex;gap:8px}
+.warn{background:#fff9db;color:#e67700}
+.empty{text-align:center;padding:32px 16px;color:var(--t3);font-size:13px}
+.result{border:1px solid var(--b1);border-radius:10px;padding:12px;margin-top:8px;text-align:left;background:var(--w)}
+.result .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.result .fname{font-size:13px;font-weight:500;flex:1}
+.result .score{font-size:12px;color:var(--p);font-weight:600;margin-left:auto}
+.result .text{font-size:13px;color:#495057;line-height:1.5;margin-top:4px;max-height:120px;overflow-y:auto}
+.result .info{font-size:10px;color:var(--t3);margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
+.doc-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg);border-radius:8px;margin-top:6px;text-align:left;flex-wrap:wrap;gap:6px}
+.doc-row .info{font-size:12px;color:var(--t1)}
+.doc-row .meta{font-size:10px;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap}
+.doc-row .actions{display:flex;gap:6px}
 mark{background:#fff3bf;padding:0 2px;border-radius:2px}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+.spinner-dark{border-color:var(--t3);border-top-color:transparent}
+.pulse{animation:pulse 1.5s ease-in-out infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.footer{text-align:center;padding:12px;font-size:10px;color:var(--gray-400);border-top:1px solid var(--gray-200);margin-top:24px}
-.login-icon{width:56px;height:56px;background:var(--primary-light);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-.login-icon svg{width:28px;height:28px;color:var(--primary)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.footer{text-align:center;padding:12px;font-size:10px;color:var(--t3);border-top:1px solid var(--b1);margin-top:24px}
+.login-icon{width:56px;height:56px;background:var(--pl);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.login-icon svg{width:30px;height:30px;color:var(--p)}
 .error-msg{background:#fff5f5;color:#c92a2a;padding:10px;border-radius:8px;font-size:13px;margin-top:8px}
+.preview-box{background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:12px;margin-top:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto}
 </style>
 </head>
 <body>
 
 <nav id="navbar" style="display:none">
 <div class="logo">
-<svg viewBox="0 0 32 32" fill="none" style="width:24px;height:24px"><circle cx="16" cy="16" r="14" stroke="#4263eb" stroke-width="2"/><path d="M10 20l3-6 3 4 3-8 3 10" stroke="#4263eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="4" r="2" fill="#4263eb"/></svg>
+<svg viewBox="0 0 32 32" fill="none" style="width:26px;height:26px"><circle cx="16" cy="16" r="14" stroke="#4263eb" stroke-width="2"/><path d="M10 20l3-6 3 4 3-8 3 10" stroke="#4263eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="4" r="2" fill="#4263eb"/></svg>
 Argos <span class="badge">RAG</span>
 </div>
 <div class="user"><span id="nav-user"></span><a href="#" onclick="logout()">Esci</a></div>
 </nav>
 
 <main>
-<!-- SOCIAL LOGIN -->
+<!-- LOGIN -->
 <div class="page active" id="page-login">
-<div class="card">
+<div class="c" style="text-align:center">
 <div class="login-icon">
 <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#4263eb" stroke-width="2"/><path d="M10 20l3-6 3 4 3-8 3 10" stroke="#4263eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="4" r="2" fill="#4263eb"/></svg>
 </div>
-<h2 style="font-size:18px;margin-bottom:4px">Argos RAG</h2>
-<p style="color:var(--gray-500);font-size:13px;margin-bottom:20px">Accedi per caricare e cercare documenti</p>
+<h2 style="font-size:20px;margin-bottom:4px">Argos RAG</h2>
+<p style="color:var(--t2);font-size:14px;margin-bottom:20px">Sistema RAG modulare multimodale</p>
 
-<button class="btn btn-primary" onclick="googleLogin()" style="background:#fff;color:var(--gray-700);border:2px solid var(--gray-200);margin-bottom:8px">
-<svg viewBox="0 0 24 24" style="width:18px"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-Accedi con Google
-</button>
-
-<div style="border-top:1px solid var(--gray-200);margin:16px 0;position:relative">
-<span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;padding:0 12px;font-size:11px;color:var(--gray-400)">oppure</span>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+<input type="email" id="login-email" placeholder="La tua email..." value="morphblue91@gmail.com" style="flex:1">
+<button class="btn btn-p" onclick="emailLogin()">📧 Accedi</button>
 </div>
 
-<input type="email" id="login-email" placeholder="La tua email..." value="morphblue91@gmail.com" style="margin-bottom:8px">
-<button class="btn btn-primary" onclick="emailLogin()" style="margin-bottom:8px">📧 Accedi con Email</button>
-
-<div style="border-top:1px solid var(--gray-200);margin:16px 0;position:relative">
-<span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;padding:0 12px;font-size:11px;color:var(--gray-400)">admin</span>
+<div style="border-top:1px solid var(--b1);margin:14px 0;position:relative">
+<span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--w);padding:0 12px;font-size:12px;color:var(--t3)">admin</span>
 </div>
 
 <input type="password" id="admin-password" placeholder="Password amministratore..." style="margin-bottom:8px">
-<button class="btn btn-primary" onclick="adminLogin()" style="background:var(--gray-800)">⚙️ Accedi come Admin</button>
+<button class="btn btn-s" onclick="adminLogin()" style="width:100%;justify-content:center">⚙️ Accedi come Admin</button>
 <div id="login-error"></div>
 </div>
 </div>
 
-<!-- UPLOAD (utenti normali) -->
+<!-- UPLOAD utente -->
 <div class="page" id="page-upload">
-<div class="card card-left">
+<div class="c">
 <h2>📤 Carica Documenti</h2>
-<p style="font-size:12px;color:var(--gray-500);margin-bottom:12px">Fonte: <strong id="upload-source"></strong></p>
+<p style="font-size:12px;color:var(--t2);margin-bottom:10px">Fonte: <strong id="upload-source"></strong></p>
 <div class="dropzone" id="dropzone">
 <p>📁 Trascina file qui o clicca per selezionare</p>
-<p style="font-size:11px">PDF · Word · Excel · PPT · TXT · MD · JPG · PNG · MP3 · MP4...</p>
+<p style="font-size:11px">PDF · Word · Excel · PPT · TXT · MD · JPG · PNG · MP3 · MP4 · WAV · MOV...</p>
 </div>
-<input type="file" id="file-input" multiple style="display:none">
+<input type="file" id="file-input" multiple style="display:none" accept="*/*">
 <div id="file-list"></div>
 <div class="gap row">
-<button class="btn btn-primary" id="upload-btn" disabled onclick="uploadAll()" style="flex:1">📤 Carica e Indicizza</button>
-<button class="btn btn-secondary btn-sm" onclick="clearFiles()">Svuota</button>
+<button class="btn btn-p" id="upload-btn" disabled onclick="uploadAll()" style="flex:1">📤 Carica e Indicizza</button>
+<button class="btn btn-s btn-sm" onclick="clearFiles()">Svuota</button>
 </div>
 <div id="upload-status"></div>
 </div>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ADMIN -->
 <div class="page" id="page-admin">
-<div class="card card-left">
+<div class="c">
 <h2>⚙️ Pannello Amministratore</h2>
-<p style="font-size:12px;color:var(--gray-500);margin-bottom:12px">Accesso: <strong id="admin-info">admin</strong></p>
-<div class="row" style="margin-bottom:12px">
-<button class="btn btn-secondary btn-sm" onclick="adminSearch()">🔍 Ricerca Semantica</button>
-<button class="btn btn-secondary btn-sm" onclick="listAllDocs()">📋 Tutti i Documenti</button>
-<button class="btn btn-secondary btn-sm" onclick="listAllSources()">👥 Fonti</button>
-<button class="btn btn-secondary btn-sm" onclick="adminHealth()">❤️ Health</button>
+<div class="row" style="margin-bottom:10px">
+<button class="btn btn-s btn-sm" onclick="showSearch()">🔍 Ricerca Semantica</button>
+<button class="btn btn-s btn-sm" onclick="listDocs()">📋 Documenti</button>
+<button class="btn btn-s btn-sm" onclick="listSources()">👥 Fonti</button>
+<button class="btn btn-s btn-sm" onclick="showHealth()">❤️ Health</button>
 </div>
 <div id="admin-content"></div>
 </div>
@@ -139,19 +139,14 @@ Accedi con Google
 <div class="footer">Argos v0.1.0 · AES-256-GCM · Qdrant · Modular RAG</div>
 
 <script>
-const ADMIN_PASSWORD = 'radu';
-let session = null; // {email, sourceId, role: 'user'|'admin'}
+const ADMIN_PW = 'radu';
+let session = null; // {email, sourceId, role}
 let files = [];
-let searchType = '';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Check saved session
   const saved = localStorage.getItem('argos_session');
-  if (saved) {
-    try { session = JSON.parse(saved); showApp(); } catch(e) { localStorage.removeItem('argos_session'); }
-  }
+  if (saved) { try { session = JSON.parse(saved); showApp(); } catch(e) { localStorage.removeItem('argos_session'); } }
 
-  // Dropzone
   const dz = document.getElementById('dropzone');
   if (dz) {
     dz.addEventListener('click', () => document.getElementById('file-input').click());
@@ -164,42 +159,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Auth ──
-async function googleLogin() {
-  const err = document.getElementById('login-error');
-  err.innerHTML = '<div class="error-msg">Google OAuth richiede configurazione Google Cloud Console. Usa il login email per ora.</div>';
-}
-
 async function emailLogin() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) return;
-
   const err = document.getElementById('login-error');
   try {
-    // Register/get source
-    let r = await fetch('/api/sources', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({source_type:'email', source_value:email})
-    });
+    let r = await fetch('/api/sources', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({source_type:'email', source_value:email}) });
     const source = await r.json();
     session = {email, sourceId: source.id, role: 'user'};
     localStorage.setItem('argos_session', JSON.stringify(session));
     showApp();
-  } catch(e) {
-    err.innerHTML = `<div class="error-msg">Errore: ${e.message}</div>`;
-  }
+  } catch(e) { err.innerHTML = '<div class="error-msg">❌ Errore: ' + e.message + '</div>'; }
 }
 
-async function adminLogin() {
+function adminLogin() {
   const pw = document.getElementById('admin-password').value;
   const err = document.getElementById('login-error');
-
-  if (pw !== ADMIN_PASSWORD) {
-    err.innerHTML = '<div class="error-msg">❌ Password amministratore errata</div>';
-    return;
-  }
-
-  session = {email: 'admin@argos.local', sourceId: 'admin', role: 'admin'};
+  if (pw !== ADMIN_PW) { err.innerHTML = '<div class="error-msg">❌ Password errata</div>'; return; }
+  session = {email:'admin@argos', sourceId:'admin', role:'admin'};
   localStorage.setItem('argos_session', JSON.stringify(session));
   showApp();
 }
@@ -210,24 +187,25 @@ function logout() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-login').classList.add('active');
   document.getElementById('navbar').style.display = 'none';
+  document.getElementById('nav-user').textContent = '';
 }
 
 function showApp() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-login').classList.remove('active');
   document.getElementById('navbar').style.display = 'flex';
-  document.getElementById('nav-user').textContent = session?.email;
+  document.getElementById('nav-user').textContent = session?.email || '';
 
   if (session?.role === 'admin') {
     document.getElementById('page-admin').classList.add('active');
-    document.getElementById('admin-info').textContent = 'admin';
+    showSearch(); // Default view for admin
   } else {
     document.getElementById('page-upload').classList.add('active');
-    document.getElementById('upload-source').textContent = session?.email;
+    document.getElementById('upload-source').textContent = session?.email || '';
   }
 }
 
-// ── File Handling ──
+// ── File handling ──
 function addFiles(newFiles) { for (const f of newFiles) files.push(f); renderFiles(); }
 function removeFile(i) { files.splice(i,1); renderFiles(); }
 function clearFiles() { files = []; renderFiles(); }
@@ -245,15 +223,13 @@ function renderFiles() {
 }
 
 function fmtSize(b) {
-  if (b<1024) return b+'B';
-  if (b<1048576) return (b/1024).toFixed(1)+'KB';
-  return (b/1048576).toFixed(1)+'MB';
+  if (b<1024) return b+'B'; if (b<1048576) return (b/1024).toFixed(1)+'KB';
+  if (b<1073741824) return (b/1048576).toFixed(1)+'MB'; return (b/1073741824).toFixed(1)+'GB';
 }
 
 // ── Upload ──
 async function uploadAll() {
   if (!files.length || !session) return;
-
   const btn = document.getElementById('upload-btn');
   const statusDiv = document.getElementById('upload-status');
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Caricamento...';
@@ -268,158 +244,148 @@ async function uploadAll() {
       const r = await fetch('/api/documents/upload', { method:'POST', body: form });
       const data = await r.json();
       if (r.ok) {
-        statusDiv.innerHTML += `<div class="status ok">✅ ${file.name}: ${data.message||'OK'}</div>`;
+        statusDiv.innerHTML += `<div class="status ok">✅ ${file.name}: ${data.message||'OK'} (ID: ${(data.document_id||'').slice(0,8)})</div>`;
       } else {
-        statusDiv.innerHTML += `<div class="status err">❌ ${file.name}: ${data.detail||data.message||'Errore'}</div>`;
+        statusDiv.innerHTML += `<div class="status err">❌ ${file.name}: ${data.detail||'Errore'}</div>`;
       }
     } catch(e) {
       statusDiv.innerHTML += `<div class="status err">❌ ${file.name}: ${e.message}</div>`;
     }
   }
-
   files = []; renderFiles();
   btn.innerHTML = '📤 Carica e Indicizza';
 }
 
 // ── Admin: Search ──
-function adminSearch() {
-  searchType = 'search';
+function showSearch() {
   const div = document.getElementById('admin-content');
-  div.innerHTML = `<div class="card-left" style="margin-bottom:12px">
+  div.innerHTML = `
     <h3>🔍 Ricerca Semantica</h3>
-    <input type="text" id="admin-search-query" placeholder="Cerca nei documenti..." onkeydown="if(event.key==='Enter')doAdminSearch()">
-    <div class="row gap">
-      <button class="btn btn-primary btn-sm" onclick="doAdminSearch()">Cerca</button>
-      <select id="admin-search-source" style="width:auto">
-        <option value="">Tutte le fonti</option>
-      </select>
-      <select id="admin-search-topk" style="width:auto">
-        <option value="10">Top 10</option>
-        <option value="20" selected>Top 20</option>
-        <option value="50">Top 50</option>
-      </select>
+    <div class="row" style="margin-bottom:8px">
+      <input type="text" id="admin-q" placeholder="Cerca nel contenuto dei documenti..." style="flex:1" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn btn-p btn-sm" onclick="doSearch()">Cerca</button>
     </div>
-  </div>
-  <div id="admin-search-results"></div>`;
+    <div class="row" style="margin-bottom:8px;font-size:12px">
+      <label>Top-K: <select id="admin-topk" style="width:70px;padding:4px"><option>5</option><option selected>10</option><option>20</option><option>50</option></select></label>
+      <label>Fonte: <select id="admin-source" style="width:auto;padding:4px"><option value="">Tutte</option></select></label>
+    </div>
+    <div id="search-results"></div>`;
 
   // Load sources for filter
   fetch('/api/sources').then(r => r.json()).then(sources => {
-    const sel = document.getElementById('admin-search-source');
-    if (sel) sel.innerHTML = '<option value="">Tutte le fonti</option>' +
-      sources.map(s => `<option value="${s.id}">${s.source_value}</option>`).join('');
+    const sel = document.getElementById('admin-source');
+    if (sel) sources.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = s.source_value; sel.appendChild(o); });
   });
 }
 
-async function doAdminSearch() {
-  const query = document.getElementById('admin-search-query')?.value.trim();
-  if (!query) return;
+async function doSearch() {
+  const q = document.getElementById('admin-q')?.value.trim();
+  if (!q) return;
+  const topk = parseInt(document.getElementById('admin-topk')?.value || '10');
+  const sid = document.getElementById('admin-source')?.value || '';
+  const div = document.getElementById('search-results');
+  div.innerHTML = '<div class="empty pulse">🔍 Ricerca semantica in corso...</div>';
 
-  const sourceId = document.getElementById('admin-search-source')?.value;
-  const topK = parseInt(document.getElementById('admin-search-topk')?.value || '20');
-  const div = document.getElementById('admin-search-results');
-  div.innerHTML = '<div class="empty">Ricerca...</div>';
+  const body = {query: q, top_k: topk};
+  if (sid) body.source_id = sid;
 
   try {
-    const r = await fetch('/api/search', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({query, top_k:topK, source_id: sourceId||undefined})
-    });
+    const r = await fetch('/api/search', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const data = await r.json();
+    
+    if (!data.results?.length) { div.innerHTML = '<div class="empty">🔍 Nessun risultato trovato</div>'; return; }
 
-    if (!data.results?.length) { div.innerHTML = '<div class="empty">🔍 Nessun risultato</div>'; return; }
-
-    div.innerHTML = `<p style="font-size:11px;color:var(--gray-500);margin:8px 0">${data.total_results} risultati · ${data.took_ms?.toFixed(1)||0}ms · ${data.embedding_model||''}</p>` +
-      data.results.map(r => {
-        const scorePct = ((r.score||0)*100).toFixed(1);
-        const text = r.text||'';
-        const idx = text.toLowerCase().indexOf(query.toLowerCase());
-        let display = text.length>250 ? text.slice(0,250)+'...' : text;
+    div.innerHTML = `<p style="font-size:11px;color:var(--t2);margin:8px 0">${data.total_results} risultati · ${data.took_ms?.toFixed(0)||0}ms · ${data.embedding_model||''}</p>` +
+      data.results.map(h => {
+        const pct = ((h.score||0)*100).toFixed(0);
+        const txt = (h.text||'').substring(0, 300);
         return `<div class="result">
           <div class="meta">
-            <span class="fname">📄 ${r.original_filename||'?'}</span>
-            <span style="font-size:10px;background:var(--primary-light);color:var(--primary);padding:1px 6px;border-radius:99px">${r.document_type||'?'}</span>
-            <span class="score">${scorePct}%</span>
+            <span class="fname">📄 ${h.original_filename||'?'}</span>
+            <span style="font-size:10px;background:var(--pl);color:var(--p);padding:2px 7px;border-radius:99px">${h.document_type||'?'}</span>
+            <span class="score">${pct}% match</span>
           </div>
-          <div class="text">${display}</div>
-          <div class="info">chunk #${r.chunk_index||0} · doc:${(r.document_id||'').slice(0,8)} · src:${(r.source_id||'').slice(0,8)}</div>
+          <div class="text">${txt}${(h.text||'').length>300?'...':''}</div>
+          <div class="info">
+            <span>chunk #${h.chunk_index||0}</span>
+            <span>doc:${(h.document_id||'').slice(0,8)}</span>
+            <a href="/api/documents/${h.document_id}/download" style="color:var(--p);text-decoration:none">⬇ Scarica</a>
+          </div>
         </div>`;
       }).join('');
   } catch(e) {
-    div.innerHTML = `<div class="status err">❌ Ricerca semantica non disponibile: ${e.message}. Assicurati che Qdrant sia in esecuzione.</div>`;
+    div.innerHTML = `<div class="status warn">⚠️ Ricerca semantica non disponibile: ${e.message}. Qdrant potrebbe non essere attivo.</div>`;
   }
 }
 
 // ── Admin: Documents ──
-async function listAllDocs() {
+async function listDocs() {
   const div = document.getElementById('admin-content');
-  div.innerHTML = '<div class="empty">Caricamento documenti...</div>';
+  div.innerHTML = '<div class="empty pulse">📋 Caricamento documenti...</div>';
 
   try {
     const sr = await fetch('/api/sources');
     const sources = await sr.json();
     let allDocs = [];
-
+    
     for (const src of sources) {
       try {
         const dr = await fetch(`/api/documents/by-source/${src.id}`);
         const docs = await dr.json();
-        allDocs.push(...docs.map(d => ({...d, source_email: src.source_value})));
+        for (const d of docs) d._source_email = src.source_value;
+        allDocs.push(...docs);
       } catch(e) {/* skip */}
     }
 
-    if (!allDocs.length) { div.innerHTML = '<div class="empty">📋 Nessun documento nel sistema</div>'; return; }
+    if (!allDocs.length) { div.innerHTML = '<div class="empty">📋 Nessun documento nel sistema. Carica documenti prima.</div>'; return; }
 
-    div.innerHTML = `<p style="font-size:11px;color:var(--gray-500);margin-bottom:8px">${allDocs.length} documenti totali</p>` +
+    allDocs.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+    div.innerHTML = `<p style="font-size:11px;color:var(--t2);margin-bottom:8px">${allDocs.length} documenti totali</p>` +
       allDocs.map(d => `<div class="doc-row">
-        <div>
+        <div style="flex:1;min-width:200px">
           <div class="info">📄 <strong>${d.original_filename}</strong></div>
           <div class="meta">
-            <span>${d.document_type}</span> ·
-            <span>${fmtSize(d.file_size_bytes)}</span> ·
-            <span>${d.status}</span> ·
+            <span>${d.document_type||'?'}</span> ·
+            <span>${fmtSize(d.file_size_bytes||0)}</span> ·
+            <span>${d.status||'?'}</span> ·
             <span>${new Date(d.created_at).toLocaleDateString()}</span>
           </div>
         </div>
-        <div style="text-align:right;font-size:10px;color:var(--gray-400)">${d.source_email||d.source_id||''}<br>ID: ${(d.id||'').slice(0,12)}</div>
+        <div class="actions">
+          <a href="/api/documents/${d.id}/download" class="btn btn-dl btn-sm">⬇ Scarica</a>
+        </div>
       </div>`).join('');
-  } catch(e) {
-    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
-  }
+  } catch(e) { div.innerHTML = `<div class="status err">❌ ${e.message}</div>`; }
 }
 
 // ── Admin: Sources ──
-async function listAllSources() {
+async function listSources() {
   const div = document.getElementById('admin-content');
-  div.innerHTML = '<div class="empty">Caricamento fonti...</div>';
-
+  div.innerHTML = '<div class="empty pulse">👥 Caricamento fonti...</div>';
   try {
     const r = await fetch('/api/sources');
     const sources = await r.json();
-    div.innerHTML = sources.map(s => `<div class="doc-row">
+    div.innerHTML = sources.length ? sources.map(s => `<div class="doc-row">
       <div class="info"><strong>${s.source_value}</strong></div>
       <div class="meta"><span>${s.source_type}</span> · <span style="font-family:monospace">${s.id}</span> · <span>${new Date(s.created_at).toLocaleDateString()}</span></div>
-    </div>`).join('') || '<div class="empty">👥 Nessuna fonte registrata</div>';
-  } catch(e) {
-    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
-  }
+    </div>`).join('') : '<div class="empty">👥 Nessuna fonte registrata</div>';
+  } catch(e) { div.innerHTML = `<div class="status err">❌ ${e.message}</div>`; }
 }
 
 // ── Admin: Health ──
-async function adminHealth() {
+async function showHealth() {
   const div = document.getElementById('admin-content');
   try {
     const r = await fetch('/api/health');
     const data = await r.json();
-    div.innerHTML = Object.entries(data).map(([k,v]) =>
-      `<div class="doc-row" style="background:transparent;border-bottom:1px solid var(--gray-100)">
-        <strong style="font-size:12px">${k}</strong>
-        <span style="font-family:monospace;font-size:11px;color:var(--gray-600)">${JSON.stringify(v)}</span>
+    div.innerHTML = `<h3>❤️ Stato Sistema</h3>` + Object.entries(data).map(([k,v]) => 
+      `<div style="padding:8px;border-bottom:1px solid var(--b1);font-size:13px;display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap">
+        <strong style="color:var(--t1)">${k}</strong>
+        <span style="font-family:monospace;font-size:12px;color:var(--t2)">${JSON.stringify(v)}</span>
       </div>`
     ).join('');
-  } catch(e) {
-    div.innerHTML = `<div class="status err">❌ ${e.message}</div>`;
-  }
+  } catch(e) { div.innerHTML = `<div class="status err">❌ ${e.message}</div>`; }
 }
 </script>
 </body>
