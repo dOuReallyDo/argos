@@ -222,7 +222,7 @@ class VectorStore:
         Args:
             query: Natural language query
             top_k: Number of results per collection
-            document_types: Filter to specific types (None = all)
+            document_types: Filter to specific types (None = text collections only)
             source_id: Filter to a specific source (for attribution tracking)
 
         Returns:
@@ -238,25 +238,29 @@ class VectorStore:
         results = []
 
         for collection in collections:
-            hits = await self.client.search(
-                collection_name=collection,
-                query_vector=query_vec[0].tolist(),
-                limit=top_k,
-                query_filter=search_filter,
-                with_payload=True,
-            )
+            try:
+                hits = await self.client.search(
+                    collection_name=collection,
+                    query_vector=query_vec[0].tolist(),
+                    limit=top_k,
+                    query_filter=search_filter,
+                    with_payload=True,
+                )
 
-            for hit in hits:
-                results.append({
-                    "score": hit.score,
-                    "collection": collection,
-                    "document_id": hit.payload.get("document_id", ""),
-                    "text": hit.payload.get("text", hit.payload.get("transcript", "")),
-                    "chunk_index": hit.payload.get("chunk_index", 0),
-                    "original_filename": hit.payload.get("original_filename", "unknown"),
-                    "document_type": hit.payload.get("document_type", "text"),
-                    "source_id": hit.payload.get("source_id", ""),
-                })
+                for hit in hits:
+                    results.append({
+                        "score": hit.score,
+                        "collection": collection,
+                        "document_id": hit.payload.get("document_id", ""),
+                        "text": hit.payload.get("text", hit.payload.get("transcript", "")),
+                        "chunk_index": hit.payload.get("chunk_index", 0),
+                        "original_filename": hit.payload.get("original_filename", "unknown"),
+                        "document_type": hit.payload.get("document_type", "text"),
+                        "source_id": hit.payload.get("source_id", ""),
+                    })
+            except Exception as e:
+                logger.warning(f"Search in {collection} failed: {e}")
+                continue
 
         # Sort by score descending
         results.sort(key=lambda x: x["score"], reverse=True)
@@ -305,12 +309,8 @@ class VectorStore:
     ) -> list[str]:
         """Determine which collections to search."""
         if not doc_types:
-            return [
-                self.TEXT_COLLECTION,
-                self.IMAGE_COLLECTION,
-                self.AUDIO_COLLECTION,
-                self.VIDEO_COLLECTION,
-            ]
+            # Default: search text collections only (same dimension)
+            return [self.TEXT_COLLECTION]
 
         collections = set()
         for dt in doc_types:

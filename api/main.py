@@ -38,6 +38,15 @@ async def lifespan(app: FastAPI):
         f"storage: {settings.storage_backend}"
     )
 
+    # Initialize vector store (Qdrant collections)
+    try:
+        from embeddings.vector_store import VectorStore
+        vs = VectorStore()
+        await vs.initialize()
+        logger.info("Vector store initialized — Qdrant connected")
+    except Exception as e:
+        logger.warning(f"Vector store unavailable: {e}")
+
     yield
 
     # Shutdown

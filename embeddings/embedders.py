@@ -452,7 +452,8 @@ class EmbeddingManager:
     def active_dimension(self) -> int:
         if self._current == "gemini":
             return 3072
-        return 768  # E5-large dimension (default)
+        # Dynamically get from text embedder
+        return self._get_text().embedding_dim
 
     async def embed_texts(
         self, texts: list[str], for_query: bool = False
