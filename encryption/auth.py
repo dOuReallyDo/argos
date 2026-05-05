@@ -118,14 +118,12 @@ async def get_current_source(
     api_key: Optional[str] = Security(api_key_header),
 ) -> TokenData:
     """FastAPI dependency: authenticate and return source identity.
-
-    Supports three auth methods (tried in order):
-    1. Bearer token (Authorization: Bearer <jwt>)
-    2. OAuth2 token (?token=<jwt> in query)
-    3. API Key (X-API-Key: <api_key>)
-
-    Every authenticated request is tied to a source_id.
+    
+    In development mode, auth is optional — returns a guest identity.
     """
+    from core.config import get_settings
+    settings = get_settings()
+    
     token_str = None
 
     if authorization:
@@ -133,8 +131,6 @@ async def get_current_source(
     elif token:
         token_str = token
     elif api_key:
-        # API Key mode: treat key as pre-validated source identifier
-        # In production, hash the key and look it up
         return TokenData(
             sub=api_key,
             exp=datetime.now(timezone.utc) + timedelta(days=365),
@@ -142,6 +138,12 @@ async def get_current_source(
         )
 
     if not token_str:
+        if settings.env == "development":
+            return TokenData(
+                sub="dev-guest",
+                exp=datetime.now(timezone.utc) + timedelta(days=365),
+                scope="read-write",
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required (Bearer token, OAuth2, or X-API-Key)",

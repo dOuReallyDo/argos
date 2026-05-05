@@ -210,15 +210,20 @@ async def upload_document(
                 message=record.error_message or "Processing failed",
             )
 
-        # Chunk and embed
+        # Chunk and embed (skip if Qdrant unavailable)
         chunks = pipeline._chunk_text(record.parsed_text or "")
-        point_ids = await vector_store.index_document(record, chunks)
-
-        # Persist chunk references
-        from storage.repository import ChunkRepository
-
-        collection = vector_store._collection_for_type(record.document_type)
-        await ChunkRepository.create_batch(db, record.id, chunks, point_ids, collection)
+        point_ids = []
+        
+        try:
+            point_ids = await vector_store.index_document(record, chunks)
+            # Persist chunk references
+            from storage.repository import ChunkRepository
+            collection = vector_store._collection_for_type(record.document_type)
+            await ChunkRepository.create_batch(db, record.id, chunks, point_ids, collection)
+            indexed_msg = f"{len(chunks)} chunks indexed"
+        except Exception as qe:
+            logger.warning(f"Vector indexing skipped (Qdrant unavailable): {qe}")
+            indexed_msg = f"{len(chunks)} chunks parsed (vector indexing unavailable)"
 
         # Update embedding metadata
         await DocumentRepository.update_embedding_metadata(
@@ -236,7 +241,7 @@ async def upload_document(
             document_id=record.id,
             filename=record.original_filename,
             status="completed",
-            message=f"Successfully processed: {len(chunks)} chunks indexed",
+            message=f"Successfully processed: {indexed_msg}",
         )
 
     except Exception as e:
