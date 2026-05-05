@@ -1,0 +1,41 @@
+# ── Argos RunPod GPU Dockerfile ─────────────────────────
+# Multi-stage: build deps, copy app, ready to run
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+
+WORKDIR /app
+
+# System dependencies (ffmpeg, tesseract, redis for queue)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg tesseract-ocr tesseract-ocr-ita tesseract-ocr-eng \
+    libgl1-mesa-glx libglib2.0-0 curl ca-certificates \
+    redis-server git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Qdrant binary
+RUN curl -sL https://github.com/qdrant/qdrant/releases/download/v1.13.0/qdrant-x86_64-unknown-linux-gnu.tar.gz \
+    -o /tmp/qdrant.tar.gz && \
+    cd /tmp && tar xzf qdrant.tar.gz && mv qdrant /usr/local/bin/ && rm /tmp/qdrant.tar.gz
+
+# Copy Argos source
+COPY pyproject.toml README.md LICENSE ./
+COPY core/ ./core/
+COPY ingestion/ ./ingestion/
+COPY embeddings/ ./embeddings/
+COPY storage/ ./storage/
+COPY encryption/ ./encryption/
+COPY api/ ./api/
+COPY ui/spa.html ./ui/spa.html
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -e "." && \
+    pip install --no-cache-dir sentence-transformers easyocr
+
+# Create dirs
+RUN mkdir -p /app/data/files /app/data/logs /app/data/qdrant
+
+# Startup script
+COPY deploy/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 8000
+ENTRYPOINT ["/entrypoint.sh"]
