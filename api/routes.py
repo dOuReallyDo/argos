@@ -323,6 +323,23 @@ async def download_document(
         raise HTTPException(status_code=404, detail="Document file not found in storage")
 
 
+@router.get(
+    "/documents/by-source/{source_id}",
+    response_model=list[DocumentResponse],
+    tags=["Documents"],
+)
+async def get_documents_by_source(
+    source_id: str,
+    limit: int = Query(100, le=500),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    token: TokenData = Depends(get_current_source),
+):
+    """Get all documents from a specific source."""
+    docs = await DocumentRepository.get_by_source(db, source_id, limit, offset)
+    return [DocumentResponse.model_validate(d) for d in docs]
+
+
 # ── Search ────────────────────────────────────────────────────
 
 @router.post(
