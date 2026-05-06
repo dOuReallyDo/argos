@@ -1,0 +1,32 @@
+name: Make GHCR Packages Public
+
+on:
+  workflow_dispatch:
+
+jobs:
+  make-public:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Make argos package public
+        run: |
+          # Try different API endpoints to change package visibility
+          
+          # List packages to see what we have
+          echo "=== Listing packages ==="
+          gh api /user/packages?package_type=container 2>&1 || true
+
+          # Try to make public - user endpoint
+          echo "=== Making public (user endpoint) ==="
+          gh api --method PATCH /user/packages/container/argos \
+            -f visibility=public 2>&1 || true
+
+          # Try org endpoint  
+          echo "=== Making public (org endpoint) ==="
+          gh api --method PATCH /orgs/doureallydo/packages/container/argos \
+            -f visibility=public 2>&1 || true
+
+          # Verify
+          echo "=== Verifying ==="
+          curl -s https://ghcr.io/v2/doureallydo/argos/tags/list 2>&1 | head -3
