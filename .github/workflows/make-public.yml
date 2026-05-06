@@ -13,43 +13,29 @@ jobs:
     steps:
       - name: Make argos package public
         run: |
-          # The package was pushed from this repo, so it's repo-owned
-          # Try GitHub GraphQL to find and update package visibility
+          echo "=== Verify image exists ==="
+          echo "${{ github.token }}" | docker login ghcr.io -u doureallydo --password-stdin
+          docker pull ghcr.io/doureallydo/argos:latest 2>&1 || echo "Pull failed"
           
-          echo "=== Finding package via GraphQL ==="
+          echo "=== Try GraphQL mutation ==="
           gh api graphql -f query='
-            query {
-              repository(owner: "dOuReallyDo", name: "argos") {
-                packages(first: 10, packageType: CONTAINER) {
-                  nodes {
-                    id
-                    name
-                    packageType
-                  }
-                }
+            mutation {
+              updatePackage(input: {packageId: "", visibility: PUBLIC}) {
+                package { name visibility }
               }
             }
-          ' 2>&1 || echo "GraphQL failed"
+          ' 2>&1 || echo "graphql mutation failed"
           
-          # Try direct REST with repo context
-          echo "=== Direct REST call ==="
-          curl -s -X PATCH \
-            -H "Authorization: Bearer ${{ github.token }}" \
+          echo "=== List all container packages ==="
+          curl -s -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            -d '{"visibility":"public"}' \
-            "https://api.github.com/user/packages/container/argos" 2>&1
+            "https://api.github.com/user/packages?package_type=container&visibility=private" 2>&1
           
-          # Try via the username in the URL path  
-          echo "=== Via username path ==="
-          curl -s -X PATCH \
-            -H "Authorization: Bearer ${{ github.token }}" \
+          echo "=== Try with org: doureallydo ==="
+          curl -s -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            -d '{"visibility":"public"}' \
-            "https://api.github.com/users/doureallydo/packages/container/argos" 2>&1
+            "https://api.github.com/orgs/doureallydo/packages?package_type=container" 2>&1
           
-          # Verify
-          echo "=== Verifying ==="
-          sleep 10
-          curl -s https://ghcr.io/v2/doureallydo/argos/tags/list 2>&1 | head -3
+          echo ""
+          echo "⚠️ If API doesn't work, make public manually:"
+          echo "   https://github.com/doureallydo?tab=packages → argos → Settings → Danger Zone → Change visibility → Public"
