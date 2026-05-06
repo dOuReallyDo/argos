@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Make argos package public
         run: |
