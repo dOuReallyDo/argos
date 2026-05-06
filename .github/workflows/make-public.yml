@@ -13,22 +13,43 @@ jobs:
     steps:
       - name: Make argos package public
         run: |
-          # Try different API endpoints to change package visibility
+          # The package was pushed from this repo, so it's repo-owned
+          # Try GitHub GraphQL to find and update package visibility
           
-          # List packages to see what we have
-          echo "=== Listing packages ==="
-          gh api /user/packages?package_type=container 2>&1 || true
-
-          # Try to make public - user endpoint
-          echo "=== Making public (user endpoint) ==="
-          gh api --method PATCH /user/packages/container/argos \
-            -f visibility=public 2>&1 || true
-
-          # Try org endpoint  
-          echo "=== Making public (org endpoint) ==="
-          gh api --method PATCH /orgs/doureallydo/packages/container/argos \
-            -f visibility=public 2>&1 || true
-
+          echo "=== Finding package via GraphQL ==="
+          gh api graphql -f query='
+            query {
+              repository(owner: "dOuReallyDo", name: "argos") {
+                packages(first: 10, packageType: CONTAINER) {
+                  nodes {
+                    id
+                    name
+                    packageType
+                  }
+                }
+              }
+            }
+          ' 2>&1 || echo "GraphQL failed"
+          
+          # Try direct REST with repo context
+          echo "=== Direct REST call ==="
+          curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            -d '{"visibility":"public"}' \
+            "https://api.github.com/user/packages/container/argos" 2>&1
+          
+          # Try via the username in the URL path  
+          echo "=== Via username path ==="
+          curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            -d '{"visibility":"public"}' \
+            "https://api.github.com/users/doureallydo/packages/container/argos" 2>&1
+          
           # Verify
           echo "=== Verifying ==="
+          sleep 10
           curl -s https://ghcr.io/v2/doureallydo/argos/tags/list 2>&1 | head -3
